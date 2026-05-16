@@ -3,386 +3,1390 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>追加注文入力</title>
+<title>魚価格検索</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wanakana/5.3.1/wanakana.min.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,'Hiragino Sans','Yu Gothic UI',sans-serif;background:#f0f4f9;color:#1a2a3a;min-height:100vh}
-header{background:linear-gradient(135deg,#1a3a5c,#1e4d7b);color:white;padding:16px 18px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(26,58,92,.3)}
-header h1{font-size:18px;font-weight:700}
-header p{font-size:11px;opacity:.6;margin-top:3px}
-.screen{padding:14px;display:flex;flex-direction:column;gap:12px;max-width:600px;margin:0 auto}
-.sec{background:white;border-radius:14px;border:1.5px solid #e4eaf4;overflow:hidden;box-shadow:0 1px 8px rgba(26,58,92,.06)}
-.sec-head{padding:12px 16px;background:#f7f9fc;border-bottom:1px solid #eaeef4;font-size:12px;font-weight:700;color:#5a7a9a;letter-spacing:.5px;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
-.store-select-wrap{padding:12px}
-.store-select{width:100%;padding:12px 16px;border:1.5px solid #e4eaf4;border-radius:10px;font-size:15px;font-family:inherit;color:#1a2a3a;background:#fafbfd;appearance:none;-webkit-appearance:none;cursor:pointer;transition:border-color .2s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231a3a5c' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
-.store-select:focus{outline:none;border-color:#1a3a5c}
-.search-wrap{padding:12px}
-.search-box{display:flex;align-items:center;gap:8px;background:#f7f9fc;border:1.5px solid #e4eaf4;border-radius:10px;padding:10px 14px;transition:border-color .2s}
-.search-box:focus-within{border-color:#1a3a5c;background:white}
-.search-box input{flex:1;border:none;outline:none;font-size:15px;font-family:inherit;background:transparent;color:#1a2a3a}
-.search-box input::placeholder{color:#b0c4d4}
-.results{padding:0 12px 12px;display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto}
-.result-item{padding:10px 14px;background:#f7f9fc;border:1.5px solid #e4eaf4;border-radius:9px;cursor:pointer;font-size:14px;font-weight:600;color:#1a3a5c}
-.result-item:active{background:#dce9f8}
-.result-item.selected{background:#eef3fb;border-color:#1a3a5c}
-.sel-info{padding:10px 16px;background:#eef3fb;border-bottom:1px solid #d8e8f4;font-size:13px;font-weight:700;color:#1a3a5c}
-.input-body{padding:14px}
-.input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.field{display:flex;flex-direction:column;gap:5px}
-.field label{font-size:10px;color:#7a9ab8;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
-.field input{padding:10px 12px;border:1.5px solid #e4eaf4;border-radius:9px;font-size:18px;font-family:inherit;color:#1a2a3a;font-weight:700;background:#fafbfd;text-align:right}
-.field input:focus{outline:none;border-color:#1a3a5c;background:white}
-.field.full{grid-column:1/-1}
-.field.full input{font-size:14px;text-align:left}
-.field select{padding:10px 12px;border:1.5px solid #e4eaf4;border-radius:9px;font-size:16px;font-family:inherit;color:#1a2a3a;font-weight:700;background:#fafbfd;appearance:none;-webkit-appearance:none;width:100%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231a3a5c' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
-.btn-add-cart{width:100%;padding:13px;background:linear-gradient(135deg,#1a3a5c,#1e4d7b);color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}
-.btn-add-cart:active{opacity:.88}
-/* Cart */
-.cart-item{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #f0f4f9}
-.cart-item:last-child{border-bottom:none}
-.cart-del{background:none;border:none;font-size:18px;cursor:pointer;color:#dde4f0;padding:4px;line-height:1;flex-shrink:0}
-.cart-del:active{color:#ef4444}
-.btn-confirm{width:100%;padding:16px;background:linear-gradient(135deg,#c62828,#e53935);color:white;border:none;border-radius:12px;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 4px 16px rgba(198,40,40,.25)}
-.btn-confirm:active{opacity:.88}
-.btn-confirm:disabled{opacity:.5}
-/* Modal */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
-.modal-overlay.show{display:flex}
-.modal-box{background:white;border-radius:20px 20px 0 0;padding:24px 20px;width:100%;max-width:600px;max-height:80vh;overflow-y:auto}
-.modal-title{font-size:17px;font-weight:700;color:#1a3a5c;margin-bottom:4px}
-.modal-sub{font-size:12px;color:#7a9ab8;margin-bottom:16px}
-.modal-list{background:#f7f9fc;border-radius:10px;margin-bottom:16px;overflow:hidden}
-.modal-row{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid #eaeef4}
-.modal-row:last-child{border-bottom:none}
-.modal-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn-cancel-modal{padding:13px;background:#f0f4f9;color:#5a7a9a;border:1.5px solid #e4eaf4;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}
-.btn-ok-modal{padding:13px;background:linear-gradient(135deg,#c62828,#e53935);color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}
-.btn-ok-modal:disabled{opacity:.5}
-/* History */
-.hist-list{padding:10px 12px;display:flex;flex-direction:column;gap:7px;max-height:280px;overflow-y:auto}
-.hist-item{background:#f7f9fc;border:1.5px solid #e4eaf4;border-radius:9px;padding:10px 13px}
-.hist-badge{display:inline-block;background:#eef3fb;color:#1a3a5c;font-size:10px;font-weight:700;border-radius:5px;padding:2px 7px;margin-bottom:6px}
-.hist-row{display:flex;justify-content:space-between;font-size:13px;color:#1a3a5c;margin-bottom:2px}
-.hist-time{font-size:10px;color:#b0c4d4;margin-top:4px}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a3a5c;color:white;padding:11px 22px;border-radius:24px;font-size:13px;font-weight:700;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap');
+
+  :root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --header-bg: #ffffff;
+    --accent: #1a6fd4;
+    --accent-light: #e8f1fb;
+    --accent2: #e05c2a;
+    --green: #1a9e5a;
+    --amber: #d97706;
+    --text: #1a1f2e;
+    --text-mid: #4a5568;
+    --text-muted: #8a97ab;
+    --border: #e2e8f0;
+    --border-strong: #c8d4e3;
+    --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --red-light: #fff1f0;
+    --red-border: #fcc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--header-bg);
+    border-bottom: 1.5px solid var(--border);
+    padding: 14px 16px 12px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .logo {
+    width: 40px; height: 40px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .title-group { flex: 1; }
+
+  .app-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  .app-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+
+  .sheet-btn {
+    background: var(--accent-light);
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .sheet-btn:active { background: #d0e4f8; }
+
+  /* ── SEARCH ── */
+  .search-wrap { position: relative; }
+
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  #searchInput {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 13px 44px 13px 44px;
+    font-size: 16px;
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  #searchInput:focus {
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(26,111,212,0.12);
+  }
+
+  #searchInput::placeholder { color: var(--text-muted); }
+
+  .clear-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--border);
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    display: none;
+    padding: 0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    line-height: 22px;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  /* ── FILTER PILLS ── */
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    padding: 10px 16px 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+
+  .filter-pill {
+    background: var(--bg);
+    border: 1.5px solid var(--border-strong);
+    color: var(--text-mid);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 7px 16px;
+    border-radius: 22px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+    transition: all 0.18s;
+  }
+
+  .filter-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(26,111,212,0.25);
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .count-badge {
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  /* ── LIST ── */
+  .list-wrap {
+    padding: 12px 12px 80px;
+  }
+
+  .item-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.15s, transform 0.12s;
+    animation: fadeUp 0.25s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .item-card:active { transform: scale(0.99); box-shadow: none; }
+
+  .card-inner {
+    padding: 0;
+    display: grid;
+    grid-template-columns: 44px 1px 1fr 1px auto;
+    align-items: center;
+    min-height: 56px;
+  }
+
+  .col-rank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 10px 0;
+  }
+
+  .col-divider {
+    width: 1px;
+    background: var(--border);
+    align-self: stretch;
+    margin: 8px 0;
+  }
+
+  .col-name {
+    padding: 10px 14px;
+    min-width: 0;
+  }
+
+  .col-price {
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .rank-badge {
+    min-width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--accent-light);
+    border: 1.5px solid #c5d9f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    flex-shrink: 0;
+  }
+
+  .card-main { flex: 1; min-width: 0; }
+
+  .store-name {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 3px;
+    letter-spacing: 0.02em;
+  }
+
+  .item-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+
+  .item-name mark {
+    background: #bfdbfe;
+    color: #1d4ed8;
+    border-radius: 3px;
+    padding: 0 2px;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    margin-right: 5px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    vertical-align: middle;
+  }
+
+  .tag-maru  { background: #dbeafe; color: #1d4ed8; }
+  .tag-ume   { background: #ffedd5; color: #c2410c; }
+  .tag-ki    { background: #fef9c3; color: #854d0e; }
+  .tag-shoku { background: #dcfce7; color: #166534; }
+  .tag-other { background: #f1f5f9; color: #64748b; }
+
+  /* ── PRICE ── */
+  .price-col { flex-shrink: 0; }
+
+  .price-inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  .price-main {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: -0.02em;
+  }
+
+  .price-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 5px;
+  }
+
+  .ratio-badge {
+    font-size: 11px;
+    color: var(--green);
+    font-family: 'DM Mono', monospace;
+    font-weight: 600;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    padding: 2px 6px;
+    border-radius: 5px;
+  }
+
+  /* ── STATE MESSAGES ── */
+  .state-msg {
+    text-align: center;
+    padding: 70px 24px;
+    color: var(--text-muted);
+  }
+
+  .state-icon { font-size: 52px; margin-bottom: 14px; }
+  .state-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .state-sub { font-size: 14px; line-height: 1.7; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 200;
+    align-items: flex-end;
+    backdrop-filter: blur(3px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px 22px 0 0;
+    padding: 24px 20px 44px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
+  }
+
+  .modal h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .form-group { margin-bottom: 14px; }
+
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    color: var(--text-mid);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .form-group input {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 15px;
+    color: var(--text);
+    font-family: 'Noto Sans JP', monospace;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus { border-color: var(--accent); background: #fff; }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 0.03em;
+    box-shadow: 0 4px 14px rgba(26,111,212,0.3);
+    transition: background 0.15s;
+  }
+  .btn-primary:active { background: #1558b0; }
+
+  .btn-close {
+    float: right;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    font-size: 18px;
+    cursor: pointer;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    margin-top: -4px;
+    line-height: 28px;
+    text-align: center;
+  }
+
+  .info-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 13px;
+    font-size: 13px;
+    color: #1e40af;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  /* ── SPINNER ── */
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── DATE PICKER BAR ── */
+  .date-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    background: var(--bg);
+    border: 1.5px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 6px 8px;
+  }
+
+  .date-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+    padding-left: 4px;
+  }
+
+  .date-nav {
+    background: var(--surface);
+    border: 1.5px solid var(--border-strong);
+    color: var(--text);
+    font-size: 18px;
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    line-height: 1;
+  }
+  .date-nav:active { background: var(--accent-light); }
+
+  .date-display {
+    flex: 1;
+    text-align: center;
+  }
+
+  .date-main {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: -0.01em;
+  }
+
+  .date-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+
+  .date-today-btn {
+    background: var(--accent-light);
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+    flex-shrink: 0;
+  }
+  .date-today-btn:active { background: #d0e4f8; }
+
+  /* Loading overlay on date change */
+  .date-loading {
+    display: none;
+    position: fixed;
+    bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--text);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 300;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    white-space: nowrap;
+  }
+
+  /* ── CALENDAR POPUP ── */
+  .cal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 250;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(2px);
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .cal-overlay.open { display: flex; }
+
+  .cal-popup {
+    background: var(--surface);
+    border-radius: 22px 22px 0 0;
+    width: 100%;
+    max-width: 480px;
+    padding: 20px 16px 36px;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.15);
+    animation: slideUp 0.22s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(60px); opacity: 0; }
+    to   { transform: translateY(0);   opacity: 1; }
+  }
+
+  .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .cal-month-label {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .cal-month-label:active { background: var(--bg); }
+
+  .cal-nav {
+    background: var(--bg);
+    border: 1.5px solid var(--border-strong);
+    color: var(--text);
+    font-size: 20px;
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+  .cal-nav:active { background: var(--accent-light); }
+
+  .cal-close {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 18px;
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 6px;
+  }
+
+  .cal-wd {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 0;
+    color: var(--text-muted);
+  }
+  .cal-wd:first-child { color: #ef4444; }
+  .cal-wd:last-child  { color: #3b82f6; }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: var(--text);
+    transition: background 0.12s, color 0.12s;
+    font-family: 'DM Mono', monospace;
+    position: relative;
+  }
+  .cal-day:active { background: var(--accent-light); }
+  .cal-day.other-month { color: var(--text-muted); opacity: 0.4; }
+  .cal-day.today::after {
+    content: '';
+    position: absolute;
+    bottom: 4px; left: 50%; transform: translateX(-50%);
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .cal-day.selected {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+  }
+  .cal-day.selected::after { background: rgba(255,255,255,0.6); }
+  .cal-day.sunday  { color: #ef4444; }
+  .cal-day.saturday { color: #3b82f6; }
+  .cal-day.selected.sunday,
+  .cal-day.selected.saturday { color: #fff; }
+  .cal-day.empty { pointer-events: none; }
+
+  .cal-today-btn {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    background: var(--accent-light);
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>📝 追加注文入力</h1>
-  <p>手動で注文を追加します</p>
-</header>
-
-<div class="screen">
-
-  <!-- ① 店舗選択 -->
-  <div class="sec">
-    <div class="sec-head">① 店舗を選択</div>
-    <div class="store-select-wrap">
-      <select class="store-select" id="store-select" onchange="onStoreChange(this)">
-        <option value="">-- 店舗を選んでください --</option>
-      </select>
+<!-- Header -->
+<div class="header">
+  <div class="header-top">
+    <div class="logo">🐟</div>
+    <div class="title-group">
+      <div class="app-title">日次計算シート 検索</div>
+      <div class="app-sub" id="sheetNameDisplay">読み込み中...</div>
     </div>
+    <button class="sheet-btn" onclick="openModal()">⚙ 設定</button>
   </div>
 
-  <!-- ② 魚種検索 -->
-  <div class="sec">
-    <div class="sec-head">② 魚種を検索</div>
-    <div class="search-wrap">
-      <div class="search-box">
-        <span style="font-size:16px">🔍</span>
-        <input type="search" id="fish-search" placeholder="魚名を入力（例: sawara / サワラ）" oninput="searchFish(this.value)" autocomplete="off">
-      </div>
+  <!-- Date picker -->
+  <div class="date-bar">
+    <span class="date-label">📅</span>
+    <button class="date-nav" onclick="changeDate(-1)" title="前の日">‹</button>
+    <div class="date-display" onclick="openCalendar()" style="cursor:pointer;">
+      <div class="date-main" id="dateDisplay">–/–</div>
+      <div class="date-sub" id="dateDisplaySub">タップしてカレンダー</div>
     </div>
-    <div id="fish-load-status" style="padding:4px 14px 8px;font-size:12px;color:#aaa">読み込み中...</div>
-    <div class="results" id="fish-results"></div>
+    <button class="date-nav" onclick="changeDate(+1)" title="次の日">›</button>
+    <button class="date-today-btn" onclick="goToday()">今日</button>
   </div>
 
-  <!-- ③ 数量・単位 -->
-  <div class="sec" id="input-sec" style="display:none">
-    <div class="sel-info" id="sel-info">-</div>
-    <div class="input-body">
-      <div class="input-row">
-        <div class="field">
-          <label>数量</label>
-          <input type="number" id="add-qty" inputmode="decimal" placeholder="0">
-        </div>
-        <div class="field">
-          <label>単位</label>
-          <select id="add-unit">
-            <option value="">-- 選択 --</option>
-            <option value="kg">kg</option>
-            <option value="本">本</option>
-            <option value="PC">PC</option>
-            <option value="枚">枚</option>
-            <option value="箱">箱</option>
-            <option value="束">束</option>
-            <option value="杯">杯</option>
-            <option value="尾">尾</option>
-          </select>
-        </div>
-        <div class="field full">
-          <label>コメント（任意）</label>
-          <input type="text" id="add-comment" placeholder="例: 小さいサイズでお願いします">
-        </div>
-      </div>
-      <button class="btn-add-cart" onclick="addToCart()">＋ リストに追加</button>
-    </div>
+  <div style="margin-top:10px;">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="サーモン / salmon / さけ..." autocomplete="off" autocorrect="off" spellcheck="false">
+    <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
   </div>
-
-  <!-- ④ 注文リスト -->
-  <div class="sec" id="cart-sec" style="display:none">
-    <div class="sec-head">
-      <span>🛒 注文リスト</span>
-      <span id="cart-count" style="background:#1a3a5c;color:white;border-radius:20px;padding:2px 10px;font-size:12px">0件</span>
-    </div>
-    <div id="cart-list"></div>
-    <div style="padding:14px">
-      <button class="btn-confirm" onclick="openConfirm()">確認、注文をする</button>
-    </div>
-  </div>
-
-  <!-- 履歴 -->
-  <div class="sec" id="hist-sec" style="display:none">
-    <div class="sec-head">
-      <span>📋 注文履歴</span>
-      <button onclick="clearHistory()" style="font-size:11px;color:#c62828;background:none;border:none;cursor:pointer;font-family:inherit;font-weight:700">🗑 全削除</button>
-    </div>
-    <div class="hist-list" id="hist-list"></div>
-  </div>
-
-</div>
-
-<!-- 確認モーダル -->
-<div class="modal-overlay" id="confirm-modal">
-  <div class="modal-box">
-    <div class="modal-title">📋 注文内容の確認</div>
-    <div class="modal-sub" id="modal-store-label">-</div>
-    <div class="modal-list" id="modal-list"></div>
-    <div class="modal-btns">
-      <button class="btn-cancel-modal" onclick="closeConfirm()">キャンセル</button>
-      <button class="btn-ok-modal" id="modal-ok-btn" onclick="submitOrder()">📤 注文確定</button>
-    </div>
-    <div id="modal-msg" style="text-align:center;font-size:12px;margin-top:10px;font-weight:600"></div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- Toast -->
+<div class="date-loading" id="toastMsg">📅 読み込み中...</div>
+
+<!-- Calendar Popup -->
+<div class="cal-overlay" id="calOverlay" onclick="handleCalOverlay(event)">
+  <div class="cal-popup">
+    <div class="cal-header">
+      <button class="cal-nav" onclick="calChangeMonth(-1)">‹</button>
+      <span class="cal-month-label" id="calMonthLabel">2025年5月</span>
+      <button class="cal-nav" onclick="calChangeMonth(+1)">›</button>
+      <button class="cal-close" onclick="closeCalendar()">✕</button>
+    </div>
+    <div class="cal-weekdays">
+      <div class="cal-wd">日</div><div class="cal-wd">月</div>
+      <div class="cal-wd">火</div><div class="cal-wd">水</div>
+      <div class="cal-wd">木</div><div class="cal-wd">金</div>
+      <div class="cal-wd">土</div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <button class="cal-today-btn" onclick="goToday(); closeCalendar();">📍 今日に移動</button>
+  </div>
+</div>
+
+<!-- Filter row -->
+<div class="filter-row" id="filterRow">
+  <button class="filter-pill active" data-store="ALL" onclick="setStore('ALL', this)">すべて</button>
+</div>
+
+
+
+<!-- Stats -->
+<div class="stats-bar">
+  <span id="statsText">データを読み込んでいます...</span>
+  <span class="count-badge" id="countBadge">–</span>
+</div>
+
+<!-- List -->
+<div class="list-wrap" id="listWrap">
+  <div class="state-msg">
+    <div class="spinner"></div>
+    <div class="state-title">読み込み中...</div>
+    <div class="state-sub">シートのデータを取得しています</div>
+  </div>
+</div>
+
+<!-- Config Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <h2>⚙ シート設定 <button class="btn-close" onclick="closeModal()">×</button></h2>
+    <div class="info-box">
+      📋 Googleスプレッドシートを <strong>「リンクを知っている全員が閲覧可能」</strong> に設定してください。<br>
+      シート名のプレフィックス（例: <code>日次計算シート</code>）を入力。日付は自動で付きます。
+    </div>
+    <div class="form-group">
+      <label>シート名プレフィックス</label>
+      <input type="text" id="sheetPrefix" value="日次計算シート" placeholder="例: 日次計算シート">
+    </div>
+    <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px;color:var(--text-mid);">
+      📌 現在のシート名: <strong id="previewSheetName">–</strong>
+    </div>
+    <button class="btn-primary" onclick="applySettings()">✅ 保存して読み込む</button>
+  </div>
+</div>
 
 <script>
-var GAS_URL  = 'https://script.google.com/macros/s/AKfycbwn0OmNmwvfoOrI5-kcMnLTeQxvbg1yOk-iFyrHXuW17pmz3b2C4Pt5MkxLslYAkxJn8Q/exec';
-var SHEET_ID = '1D1b7d6MKMO1dXkYJvDlJKPZq7Gt3zQrjFAzp7ro22Uw';
+// ===================== ROMAJI MAP =====================
+const ROMAJI_TO_HIRA = {
+  // Double consonants
+  'tte':'って','tte':'って','kke':'っけ','ppe':'っぺ','cchi':'っち','ssh':'っし',
+  // a-row
+  'a':'あ','i':'い','u':'う','e':'え','o':'お',
+  // ka-row
+  'ka':'か','ki':'き','ku':'く','ke':'け','ko':'こ',
+  'ga':'が','gi':'ぎ','gu':'ぐ','ge':'げ','go':'ご',
+  // sa-row
+  'sa':'さ','si':'し','shi':'し','su':'す','se':'せ','so':'そ',
+  'za':'ざ','zi':'じ','ji':'じ','zu':'ず','ze':'ぜ','zo':'ぞ',
+  // ta-row
+  'ta':'た','ti':'ち','chi':'ち','tsu':'つ','tu':'つ','te':'て','to':'と',
+  'da':'だ','di':'ぢ','du':'づ','de':'で','do':'ど',
+  // na-row
+  'na':'な','ni':'に','nu':'ぬ','ne':'ね','no':'の',
+  // ha-row
+  'ha':'は','hi':'ひ','hu':'ふ','fu':'ふ','he':'へ','ho':'ほ',
+  'ba':'ば','bi':'び','bu':'ぶ','be':'べ','bo':'ぼ',
+  'pa':'ぱ','pi':'ぴ','pu':'ぷ','pe':'ぺ','po':'ぽ',
+  // ma-row
+  'ma':'ま','mi':'み','mu':'む','me':'め','mo':'も',
+  // ya-row
+  'ya':'や','yu':'ゆ','yo':'よ',
+  // ra-row
+  'ra':'ら','ri':'り','ru':'る','re':'れ','ro':'ろ',
+  // wa-row
+  'wa':'わ','wi':'ゐ','we':'ゑ','wo':'を',
+  'n':'ん',
+  // compound
+  'kya':'きゃ','kyu':'きゅ','kyo':'きょ',
+  'sha':'しゃ','shu':'しゅ','sho':'しょ',
+  'cha':'ちゃ','chu':'ちゅ','cho':'ちょ',
+  'nya':'にゃ','nyu':'にゅ','nyo':'にょ',
+  'hya':'ひゃ','hyu':'ひゅ','hyo':'ひょ',
+  'mya':'みゃ','myu':'みゅ','myo':'みょ',
+  'rya':'りゃ','ryu':'りゅ','ryo':'りょ',
+  'gya':'ぎゃ','gyu':'ぎゅ','gyo':'ぎょ',
+  'ja':'じゃ','ju':'じゅ','jo':'じょ',
+  'bya':'びゃ','byu':'びゅ','byo':'びょ',
+  'pya':'ぴゃ','pyu':'ぴゅ','pyo':'ぴょ',
+  // sa/ma/ma
+  'samon':'さもん','sake':'さけ',
+};
 
-var STORES = [
-  {code:2,name:'大晴海'},{code:3,name:'海の路'},{code:4,name:'板付製造'},
-  {code:5,name:'魚蔵'},{code:6,name:'どげん海'},{code:7,name:'板付鮮魚'},
-  {code:8,name:'萬漁箱'},{code:9,name:'せんせんせん'},{code:10,name:'一承'},
-  {code:11,name:'山尾天神'},{code:12,name:'山尾博多'},{code:13,name:'山尾西新'},
-  {code:14,name:'魚屋'},{code:15,name:'藤う那天神'},{code:16,name:'一承東京'},
-  {code:17,name:'フタクチ'},{code:18,name:'野が海'},{code:20,name:'又'},
-  {code:21,name:'飛うお'},{code:22,name:'とりとりと'},{code:30,name:'藤う那博多'}
-];
-
-var FISH_NAMES=[], selectedStore=null, selectedFish=null, cart=[];
-
-var ROMAJI_MAP=[['shi','し'],['chi','ち'],['tsu','つ'],['sha','しゃ'],['shu','しゅ'],['sho','しょ'],
-  ['cha','ちゃ'],['chu','ちゅ'],['cho','ちょ'],['ka','か'],['ki','き'],['ku','く'],['ke','け'],['ko','こ'],
-  ['sa','さ'],['si','し'],['su','す'],['se','せ'],['so','そ'],['ta','た'],['te','て'],['to','と'],
-  ['na','な'],['ni','に'],['nu','ぬ'],['ne','ね'],['no','の'],['ha','は'],['hi','ひ'],['fu','ふ'],['he','へ'],['ho','ほ'],
-  ['ma','ま'],['mi','み'],['mu','む'],['me','め'],['mo','も'],['ya','や'],['yu','ゆ'],['yo','よ'],
-  ['ra','ら'],['ri','り'],['ru','る'],['re','れ'],['ro','ろ'],['wa','わ'],['wo','を'],
-  ['ga','が'],['gi','ぎ'],['gu','ぐ'],['ge','げ'],['go','ご'],['za','ざ'],['zu','ず'],['ze','ぜ'],['zo','ぞ'],
-  ['da','だ'],['de','で'],['do','ど'],['ba','ば'],['bi','び'],['bu','ぶ'],['be','べ'],['bo','ぼ'],
-  ['pa','ぱ'],['pi','ぴ'],['pu','ぷ'],['pe','ぺ'],['po','ぽ'],
-  ['a','あ'],['i','い'],['u','う'],['e','え'],['o','お'],['n','ん']];
-// ── Kanji → Hiragana reading map (魚名によく使う漢字) ──
-var KANJI_YOMI = [
-  ['小鯛','こだい'],['白魚','しらうお'],['真子','まこ'],['身欠き','みがき'],
-  ['活','かつ'],['締り','しまり'],['天然','てんねん'],['冷凍','れいとう'],
-  ['煮付け','につけ'],['殻付き','からつき'],['姫','ひめ'],['桜','さくら'],
-  ['銀浪','ぎんなみ'],['丸天','まるてん'],['鯛','たい'],['鯖','さば'],
-  ['鰯','いわし'],['鰺','あじ'],['鱧','はも'],['鮭','さけ'],['鱒','ます'],
-  ['蛸','たこ'],['烏賊','いか'],['蟹','かに'],['海老','えび'],
-  ['牡蠣','かき'],['帆立','ほたて'],['蛤','はまぐり'],['浅蜊','あさり'],
-  ['若','わか'],['共','とも'],['市','いち'],['板','いた'],['梅','うめ'],
-  ['立','りつ'],['大','だい'],['小','しょう'],['生','なま'],['黒','くろ'],
-  ['豆腐','とうふ'],['蒲鉾','かまぼこ'],['揚','あげ'],['煮','に'],
-  ['対馬','つしま'],['天神','てんじん'],['博多','はかた']
-];
-
-function kanjiToHira(name) {
-  var result = name;
-  KANJI_YOMI.forEach(function(pair){ result = result.split(pair[0]).join(pair[1]); });
+function romajiToHira(str) {
+  // Use wanakana if available
+  if (window.wanakana) {
+    try { return wanakana.toHiragana(str, { passRomaji: false }); } catch(e) {}
+  }
+  // Fallback manual
+  let result = str.toLowerCase();
+  const sorted = Object.keys(ROMAJI_TO_HIRA).sort((a,b) => b.length - a.length);
+  for (const r of sorted) result = result.replaceAll(r, ROMAJI_TO_HIRA[r]);
   return result;
 }
 
-async function init(){
-  renderStoreDropdown(); renderHistory();
-  var st=document.getElementById('fish-load-status');
-  try{
-    var res=await fetch(GAS_URL+'?action=getMaster');
-    var j=await res.json();
-    if(j.success&&j.fishNames){FISH_NAMES=j.fishNames;st.textContent=FISH_NAMES.length+'種類の魚が検索可能です';}
-    else{st.textContent='エラー: '+(j.error||'不明');}
-  }catch(e){st.textContent='通信エラー — リロードしてください';}
+function hiraToKata(str) {
+  return str.replace(/[\u3041-\u3096]/g, c => String.fromCharCode(c.charCodeAt(0)+0x60));
 }
 
-function renderStoreDropdown(){
-  var sel=document.getElementById('store-select');
-  STORES.forEach(function(s){var o=document.createElement('option');o.value=s.code;o.textContent=s.code+'　'+s.name;sel.appendChild(o);});
+function kataToHira(str) {
+  return str.replace(/[\u30A1-\u30F6]/g, c => String.fromCharCode(c.charCodeAt(0)-0x60));
 }
 
-function onStoreChange(sel){
-  var code=parseInt(sel.value);
-  selectedStore=STORES.filter(function(s){return s.code===code;})[0]||null;
-  updateInputSec();
+// ===================== STATE =====================
+let allData = [];
+let filteredData = [];
+let currentStore = 'ALL';
+let currentSort = 'rankAsc';
+let searchQuery = '';
+
+// Date state
+let currentDate = new Date();
+let sheetPrefix = '日次計算シート';
+const sheetId = '1HrmVwVkMXlTpK-9xgFLAzLc6pxewwD3nLs8do_vHfrc';
+
+const DAYS_JP = ['日','月','火','水','木','金','土'];
+
+function getSheetName(date) {
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  return `${sheetPrefix}${m}/${d}`;
 }
 
-function searchFish(q){
-  var el=document.getElementById('fish-results'),raw=q.trim();
-  if(!raw){el.innerHTML='';return;}
-  var ql=raw.toLowerCase(), qH=romaToHira(ql);
-  var m=FISH_NAMES.filter(function(n){
-    var nl  = n.toLowerCase();
-    var nh  = toHira(nl);               // カタカナ→ひらがな
-    var nk  = kanjiToHira(nl);          // 漢字→ひらがな
-    var nkh = toHira(nk);               // さらにカタカナ→ひらがな
-    return nl.indexOf(ql)!==-1 ||       // 直接一致
-           nh.indexOf(qH)!==-1 ||       // カタカナ→ひらがな一致
-           nk.indexOf(qH)!==-1 ||       // 漢字読み一致
-           nkh.indexOf(qH)!==-1;        // 漢字+カタカナ→ひらがな一致
-  }).slice(0,20);
-  if(!m.length){
-    el.innerHTML='<div style="padding:8px 14px;font-size:13px;color:#aaa">該当なし</div>'+
-      '<div class="result-item" onclick="selectFish(\''+escAttr(raw)+'\')">📝 「'+esc(raw)+'」をそのまま使用</div>';
+function formatDateDisplay(date) {
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  const day = DAYS_JP[date.getDay()];
+  return { main: `${m}月${d}日`, sub: `（${day}）` };
+}
+
+function updateDateUI() {
+  const { main, sub } = formatDateDisplay(currentDate);
+  document.getElementById('dateDisplay').textContent = main;
+  document.getElementById('dateDisplaySub').textContent = sub;
+  const name = getSheetName(currentDate);
+  document.getElementById('sheetNameDisplay').textContent = name;
+  // Update preview in modal
+  const prev = document.getElementById('previewSheetName');
+  if (prev) prev.textContent = name;
+}
+
+function changeDate(delta) {
+  currentDate = new Date(currentDate);
+  currentDate.setDate(currentDate.getDate() + delta);
+  updateDateUI();
+  loadSheet();
+}
+
+function goToday() {
+  const today = new Date();
+  if (currentDate.toDateString() === today.toDateString()) return;
+  currentDate = today;
+  updateDateUI();
+  loadSheet();
+}
+
+function applySettings() {
+  const newPrefix = document.getElementById('sheetPrefix').value.trim();
+  if (!newPrefix) { alert('入力してください'); return; }
+  sheetPrefix = newPrefix;
+  closeModal();
+  updateDateUI();
+  loadSheet();
+}
+
+function openModal() {
+  document.getElementById('previewSheetName').textContent = getSheetName(currentDate);
+  document.getElementById('sheetPrefix').value = sheetPrefix;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toastMsg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 2000);
+}
+
+// ===================== FETCH SHEET (JSONP – no CORS) =====================
+function loadSheet(isFallback = false) {
+  const name = getSheetName(currentDate);
+  if (!isFallback) {
+    showLoading();
+    showToast(`📅 ${name} を読み込み中...`);
+  }
+
+  const old = document.getElementById('jsonpScript');
+  if (old) old.remove();
+  if (window._jsonpTimer) clearTimeout(window._jsonpTimer);
+
+  const cbName = '__gviz_cb__';
+  window[cbName] = function(data) {
+    clearTimeout(window._jsonpTimer);
+    try {
+      const table = data.table;
+      const isEmpty = !table || !table.rows || table.rows.length === 0;
+
+      if (isEmpty && !isFallback) {
+        const prev = new Date(currentDate);
+        prev.setDate(prev.getDate() - 1);
+        currentDate = prev;
+        updateDateUI();
+        showToast(`⏪ ${getSheetName(prev)} を試みています...`);
+        loadSheet(true);
+        return;
+      }
+      if (isEmpty) {
+        showError('データが見つかりませんでした。シート名・公開設定を確認してください。');
+        return;
+      }
+
+      const parsed = [];
+      for (const row of table.rows) {
+        const c = row.c || [];
+        const get = i => {
+          const cell = c[i];
+          if (!cell || cell.v === null || cell.v === undefined) return '';
+          return String(cell.v);
+        };
+        const a = get(0), b = get(1), cc = get(2), d = get(3), f = get(5);
+        if (!a && !b && !cc && !d) continue;
+        const priceNum = parseFloat(d.replace(/,/g,''));
+        const fNum    = parseFloat(f.replace(/,/g,''));
+        parsed.push({
+          rank: a, store: b, name: cc,
+          price: isNaN(priceNum) ? null : priceNum, priceRaw: d,
+          fVal:  isNaN(fNum)    ? null : fNum,     fRaw: f,
+          highlighted: !isNaN(priceNum),
+          searchText: buildSearchText(b + cc)
+        });
+      }
+
+      if (parsed.length === 0) {
+        showError('データが空です。シート名を確認してください。');
+        return;
+      }
+      allData = parsed;
+      buildStoreFilters();
+      applyFilters();
+      showToast(`✅ ${getSheetName(currentDate)} (${parsed.length}件)`);
+    } catch(e) {
+      showError('解析エラー: ' + e.message);
+    }
+  };
+
+  // Timeout: callback not fired within 8s
+  window._jsonpTimer = setTimeout(() => {
+    showError('タイムアウト。ネットワークまたはシートの公開設定を確認してください。');
+  }, 8000);
+
+  // Google gviz JSONP – correct format
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq`
+    + `?sheet=${encodeURIComponent(name)}`
+    + `&tqx=responseHandler:${cbName}`;
+
+  const script = document.createElement('script');
+  script.id = 'jsonpScript';
+  script.src = url;
+  script.onerror = () => {
+    clearTimeout(window._jsonpTimer);
+    showError('スクリプト読み込みエラー。シートが公開されているか確認してください。');
+  };
+  document.head.appendChild(script);
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const data = [];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const cols = parseCSVLine(lines[i]);
+    if (!cols || cols.length < 4) continue;
+    
+    const a = (cols[0] || '').replace(/^"|"$/g,'').trim();
+    const b = (cols[1] || '').replace(/^"|"$/g,'').trim();
+    const c = (cols[2] || '').replace(/^"|"$/g,'').trim();
+    const d = (cols[3] || '').replace(/^"|"$/g,'').trim();
+    const f = (cols[5] || '').replace(/^"|"$/g,'').trim(); // column F (index 5)
+    
+    // Skip header or empty rows
+    if (!a && !b && !c && !d) continue;
+    if (isNaN(parseInt(a)) && !b) continue;
+
+    const priceNum = parseFloat(d.replace(/,/g,''));
+    const fNum = parseFloat(f.replace(/,/g,''));
+
+    data.push({
+      rank: a,
+      store: b,
+      name: c,
+      price: isNaN(priceNum) ? null : priceNum,
+      priceRaw: d,
+      fVal: isNaN(fNum) ? null : fNum,
+      fRaw: f,
+      highlighted: !isNaN(priceNum),
+      searchText: buildSearchText(b + c)
+    });
+  }
+  
+  if (data.length === 0) {
+    showError('データが見つかりませんでした。シートが公開されているか確認してください。');
     return;
   }
-  el.innerHTML=m.map(function(n){
-    return '<div class="result-item'+(selectedFish===n?' selected':'')+'" onclick="selectFish(\''+escAttr(n)+'\')">'+esc(n)+'</div>';
-  }).join('');
+  
+  allData = data;
+  buildStoreFilters();
+  applyFilters();
 }
 
-function selectFish(name){
-  selectedFish=name;
-  document.getElementById('fish-search').value=name;
-  document.getElementById('fish-results').innerHTML='<div class="result-item selected">'+esc(name)+'</div>';
-  updateInputSec();
-}
-
-function updateInputSec(){
-  var sec=document.getElementById('input-sec');
-  if(selectedStore&&selectedFish){sec.style.display='block';document.getElementById('sel-info').textContent=selectedStore.code+' '+selectedStore.name+' ／ '+selectedFish;}
-  else{sec.style.display='none';}
-}
-
-function addToCart(){
-  if(!selectedStore||!selectedFish){showToast('店舗と魚種を選択してください');return;}
-  var qty=document.getElementById('add-qty').value.trim();
-  var unit=document.getElementById('add-unit').value;
-  var cmt=document.getElementById('add-comment').value.trim();
-  if(!qty){showToast('数量を入力してください');return;}
-  if(!unit){showToast('単位を選択してください');return;}
-  cart.push({store:selectedStore,fishName:selectedFish,qty:qty,unit:unit,comment:cmt});
-  renderCart();
-  document.getElementById('add-qty').value='';
-  document.getElementById('add-unit').value='';
-  document.getElementById('add-comment').value='';
-  document.getElementById('fish-search').value='';
-  document.getElementById('fish-results').innerHTML='';
-  document.getElementById('input-sec').style.display='none';
-  selectedFish=null;
-  showToast('リストに追加しました ✓');
-}
-
-function renderCart(){
-  var sec=document.getElementById('cart-sec'),el=document.getElementById('cart-list');
-  if(!cart.length){sec.style.display='none';return;}
-  sec.style.display='block';
-  document.getElementById('cart-count').textContent=cart.length+'件';
-  el.innerHTML=cart.map(function(item,i){
-    return '<div class="cart-item">'+
-      '<button class="cart-del" onclick="removeCart('+i+')">✕</button>'+
-      '<div style="flex:1">'+
-      '<div style="font-size:14px;font-weight:700;color:#1a3a5c">'+esc(item.fishName)+'</div>'+
-      '<div style="font-size:11px;color:#7a9ab8">'+esc(item.store.code+' '+item.store.name)+(item.comment?' · 📌'+esc(item.comment):'')+'</div>'+
-      '</div>'+
-      '<div style="text-align:right">'+
-      '<div style="font-size:18px;font-weight:900;color:#1a3a5c">'+esc(item.qty)+'</div>'+
-      '<div style="font-size:11px;color:#7a9ab8">'+esc(item.unit)+'</div>'+
-      '</div></div>';
-  }).join('');
-}
-
-function removeCart(i){cart.splice(i,1);renderCart();}
-
-function openConfirm(){
-  if(!cart.length){showToast('注文リストが空です');return;}
-  document.getElementById('modal-store-label').textContent=cart.length+'件の注文';
-  document.getElementById('modal-list').innerHTML=cart.map(function(item){
-    return '<div class="modal-row">'+
-      '<div><div style="font-size:14px;font-weight:700;color:#1a3a5c">'+esc(item.fishName)+'</div>'+
-      '<div style="font-size:11px;color:#7a9ab8">'+esc(item.store.code+' '+item.store.name)+(item.comment?' · 📌'+esc(item.comment):'')+'</div></div>'+
-      '<div style="text-align:right;flex-shrink:0;margin-left:12px">'+
-      '<div style="font-size:16px;font-weight:900;color:#1a3a5c">'+esc(item.qty)+' '+esc(item.unit)+'</div>'+
-      '</div></div>';
-  }).join('');
-  document.getElementById('modal-msg').textContent='';
-  document.getElementById('modal-ok-btn').disabled=false;
-  document.getElementById('modal-ok-btn').textContent='📤 注文確定';
-  document.getElementById('confirm-modal').classList.add('show');
-}
-function closeConfirm(){document.getElementById('confirm-modal').classList.remove('show');}
-
-async function submitOrder(){
-  var btn=document.getElementById('modal-ok-btn'),msg=document.getElementById('modal-msg');
-  btn.disabled=true;btn.textContent='送信中...';msg.textContent='';
-  var errors=[];
-  for(var i=0;i<cart.length;i++){
-    var item=cart[i];
-    try{
-      var res=await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'addNewOrder',sheetId:SHEET_ID,custCode:item.store.code,custName:item.store.name,fishName:item.fishName,qty:item.qty,unit:item.unit,comment:item.comment||null}),headers:{'Content-Type':'text/plain'}});
-      var j=await res.json();
-      if(!j.success) errors.push(item.fishName);
-    }catch(e){errors.push(item.fishName);}
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if (ch === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += ch;
+    }
   }
-  if(!errors.length){
-    var h=JSON.parse(localStorage.getItem('fish_add_hist')||'[]');
-    var now=new Date();
-    h.unshift({items:cart.map(function(x){return {name:x.fishName,qty:x.qty,unit:x.unit,store:x.store.code+' '+x.store.name};}),time:pad(now.getHours())+':'+pad(now.getMinutes())});
-    if(h.length>20)h=h.slice(0,20);
-    localStorage.setItem('fish_add_hist',JSON.stringify(h));
-    cart=[];renderCart();closeConfirm();renderHistory();
-    document.getElementById('store-select').value='';selectedStore=null;selectedFish=null;
-    showToast('注文を送信しました ✓');
-  }else{
-    msg.textContent='エラー: '+errors.join(', ')+'の送信に失敗しました';msg.style.color='#c62828';
-    btn.disabled=false;btn.textContent='📤 注文確定';
+  result.push(current);
+  return result;
+}
+
+function buildSearchText(text) {
+  // Build searchable variants: original, hiragana, katakana
+  const hira = kataToHira(text);
+  const kata = hiraToKata(text);
+  return [text, hira, kata].join(' ').toLowerCase();
+}
+
+// ===================== FILTERS =====================
+function buildStoreFilters() {
+  const stores = [...new Set(allData.map(d => d.store).filter(Boolean))];
+  const row = document.getElementById('filterRow');
+  row.innerHTML = '<button class="filter-pill active" data-store="ALL" onclick="setStore(\'ALL\', this)">すべて</button>';
+  stores.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-pill';
+    btn.dataset.store = s;
+    btn.textContent = s;
+    btn.onclick = () => setStore(s, btn);
+    row.appendChild(btn);
+  });
+}
+
+function setStore(store, btn) {
+  currentStore = store;
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function setSort(sort, btn) {
+  currentSort = sort;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  searchQuery = '';
+  document.getElementById('clearBtn').style.display = 'none';
+  applyFilters();
+}
+
+// ===================== SEARCH & RENDER =====================
+function applyFilters() {
+  const q = searchQuery.trim().toLowerCase();
+  
+  // Convert romaji query to kana for matching
+  let qHira = '', qKata = '';
+  if (q && /[a-z]/.test(q)) {
+    try {
+      qHira = wanakana.toHiragana(q);
+      qKata = wanakana.toKatakana(q);
+    } catch(e) {
+      qHira = romajiToHira(q);
+      qKata = hiraToKata(qHira);
+    }
   }
+  
+  let data = allData.filter(item => {
+    // Store filter
+    if (currentStore !== 'ALL' && item.store !== currentStore) return false;
+    // Search
+    if (!q) return true;
+    const st = item.searchText;
+    const nameRaw = item.name.toLowerCase();
+    const storeRaw = item.store.toLowerCase();
+    
+    if (st.includes(q) || nameRaw.includes(q) || storeRaw.includes(q)) return true;
+    if (qHira && (st.includes(qHira) || nameRaw.includes(qHira))) return true;
+    if (qKata && (st.includes(qKata.toLowerCase()) || nameRaw.includes(qKata.toLowerCase()))) return true;
+    return false;
+  });
+
+  // Sort
+  if (currentSort === 'rankAsc') data.sort((a,b) => (parseFloat(a.rank)||9999)-(parseFloat(b.rank)||9999));
+  else if (currentSort === 'priceAsc') data.sort((a,b) => (a.price||99999)-(b.price||99999));
+  else if (currentSort === 'priceDesc') data.sort((a,b) => (b.price||0)-(a.price||0));
+  else if (currentSort === 'name') data.sort((a,b) => a.name.localeCompare(b.name, 'ja'));
+  else if (currentSort === 'ratio') data.sort((a,b) => (b.fVal||0)-(a.fVal||0));
+
+  filteredData = data;
+  renderList(data, q, qHira, qKata);
+  
+  // Stats
+  const statsEl = document.getElementById('statsText');
+  const countEl = document.getElementById('countBadge');
+  statsEl.textContent = q ? `"${q}" の検索結果` : (currentStore === 'ALL' ? 'すべてのアイテム' : currentStore);
+  countEl.textContent = data.length + '件';
 }
 
-function renderHistory(){
-  var h=JSON.parse(localStorage.getItem('fish_add_hist')||'[]');
-  var sec=document.getElementById('hist-sec');
-  if(!h.length){sec.style.display='none';return;}
-  sec.style.display='block';
-  document.getElementById('hist-list').innerHTML=h.map(function(rec){
-    var rows=(rec.items||[]).map(function(x){
-      return '<div class="hist-row">'+
-        '<span>'+esc(x.name)+(x.store?' <span style="font-size:10px;color:#aaa">'+esc(x.store)+'</span>':'')+'</span>'+
-        '<span style="font-weight:900">'+esc(x.qty)+' '+esc(x.unit)+'</span></div>';
-    }).join('');
-    return '<div class="hist-item"><div class="hist-badge">'+esc(rec.time)+'</div>'+rows+'</div>';
+function getTagInfo(name) {
+  if (name.startsWith('丸）') || name.startsWith('丸)')) return { label: '丸', cls: 'tag-maru', clean: name.replace(/^丸[）)]\s*/, '') };
+  if (name.startsWith('梅）') || name.startsWith('梅)')) return { label: '梅', cls: 'tag-ume', clean: name.replace(/^梅[）)]\s*/, '') };
+  if (name.startsWith('貴）') || name.startsWith('貴)')) return { label: '貴', cls: 'tag-ki', clean: name.replace(/^貴[）)]\s*/, '') };
+  if (name.startsWith('食）') || name.startsWith('食)')) return { label: '食', cls: 'tag-shoku', clean: name.replace(/^食[）)]\s*/, '') };
+  if (name.startsWith('フ）') || name.startsWith('フ)')) return { label: 'フ', cls: 'tag-other', clean: name.replace(/^フ[）)]\s*/, '') };
+  return { label: '', cls: 'tag-other', clean: name };
+}
+
+function highlight(text, q, qHira, qKata) {
+  if (!q) return escHtml(text);
+  let t = escHtml(text);
+  const terms = [q, qHira, qKata].filter(Boolean);
+  for (const term of terms) {
+    if (!term) continue;
+    const re = new RegExp(escRe(term), 'gi');
+    t = t.replace(re, m => `<mark>${m}</mark>`);
+  }
+  return t;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escRe(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function renderList(data, q, qHira, qKata) {
+  const wrap = document.getElementById('listWrap');
+  
+  if (data.length === 0 && allData.length === 0) return; // keep loading state
+  
+  if (data.length === 0) {
+    wrap.innerHTML = `
+      <div class="state-msg">
+        <div class="state-icon">🔍</div>
+        <div class="state-title">見つかりませんでした</div>
+        <div class="state-sub">別のキーワードで検索してみてください<br>ひらがな・カタカナ・ローマ字で検索できます</div>
+      </div>`;
+    return;
+  }
+
+  const html = data.map((item, i) => {
+    const tag = getTagInfo(item.name);
+    const nameHL = highlight(tag.clean, q, qHira, qKata);
+    const storeHL = highlight(item.store, q, qHira, qKata);
+    const isHighlighted = item.highlighted;
+    
+    return `
+    <div class="item-card" style="animation-delay:${Math.min(i*0.03, 0.5)}s">
+      <div class="card-inner">
+        <div class="col-rank">
+          <div class="rank-badge">${item.rank || '–'}</div>
+        </div>
+        <div class="col-divider"></div>
+        <div class="col-name">
+          <div class="store-name">${storeHL}</div>
+          <div class="item-name">
+            ${tag.label ? `<span class="tag ${tag.cls}">${tag.label}</span>` : ''}${nameHL}
+          </div>
+        </div>
+        <div class="col-divider"></div>
+        <div class="col-price">
+          <span class="price-label">仕入値</span>
+          <span class="price-main">${item.price !== null ? '¥' + item.price.toLocaleString() : item.priceRaw || '–'}</span>
+          ${item.fVal !== null ? `<span class="ratio-badge">F: ${item.fRaw}</span>` : ''}
+        </div>
+      </div>
+    </div>`;
   }).join('');
+
+  wrap.innerHTML = html;
 }
 
-function clearHistory(){if(!confirm('注文履歴を全て削除しますか？'))return;localStorage.removeItem('fish_add_hist');renderHistory();showToast('削除しました');}
-function pad(n){return n<10?'0'+n:String(n);}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function escAttr(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"'");}
-function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2500);}
-init();
+function showLoading() {
+  document.getElementById('listWrap').innerHTML = `
+    <div class="state-msg">
+      <div class="spinner"></div>
+      <div class="state-title">読み込み中...</div>
+      <div class="state-sub">シートのデータを取得しています</div>
+    </div>`;
+  document.getElementById('statsText').textContent = '読み込み中...';
+  document.getElementById('countBadge').textContent = '–';
+}
+
+function showError(msg) {
+  const name = getSheetName(currentDate);
+  const testUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent(name)}&tqx=responseHandler:test`;
+  document.getElementById('listWrap').innerHTML = `
+    <div class="state-msg">
+      <div class="state-icon">⚠️</div>
+      <div class="state-title">読み込みエラー</div>
+      <div class="state-sub">
+        シートを <strong>「リンクを知っている全員」が閲覧可能</strong> に設定してください。<br><br>
+        試したシート名: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:13px;">${name}</code><br><br>
+        エラー: ${msg}<br><br>
+        <a href="${testUrl}" target="_blank" style="display:inline-block;background:#e8f1fb;color:var(--accent);border:1.5px solid var(--accent);padding:10px 18px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:10px;">🔗 APIを直接確認する</a><br>
+        <button onclick="openModal()" style="background:var(--accent);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-size:15px;cursor:pointer;font-family:inherit;font-weight:700;margin-top:4px;">⚙ 設定を確認する</button>
+      </div>
+    </div>`;
+  document.getElementById('statsText').textContent = 'エラー';
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function handleOverlayClick(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+// ===================== CALENDAR =====================
+let calViewDate = new Date(); // month being viewed in calendar
+
+function openCalendar() {
+  calViewDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  renderCalendar();
+  document.getElementById('calOverlay').classList.add('open');
+}
+
+function closeCalendar() {
+  document.getElementById('calOverlay').classList.remove('open');
+}
+
+function handleCalOverlay(e) {
+  if (e.target === document.getElementById('calOverlay')) closeCalendar();
+}
+
+function calChangeMonth(delta) {
+  calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() + delta, 1);
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const y = calViewDate.getFullYear();
+  const m = calViewDate.getMonth();
+  const today = new Date();
+  const selected = currentDate;
+
+  document.getElementById('calMonthLabel').textContent = `${y}年${m+1}月`;
+
+  const firstDay = new Date(y, m, 1).getDay(); // 0=Sun
+  const lastDate = new Date(y, m+1, 0).getDate();
+  const prevLastDate = new Date(y, m, 0).getDate();
+
+  let html = '';
+
+  // Prev month trailing days
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const d = prevLastDate - i;
+    html += `<button class="cal-day other-month empty">${d}</button>`;
+  }
+
+  // Current month days
+  for (let d = 1; d <= lastDate; d++) {
+    const dow = new Date(y, m, d).getDay();
+    const isToday = (d === today.getDate() && m === today.getMonth() && y === today.getFullYear());
+    const isSel  = (d === selected.getDate() && m === selected.getMonth() && y === selected.getFullYear());
+    const cls = [
+      'cal-day',
+      isToday ? 'today' : '',
+      isSel   ? 'selected' : '',
+      dow === 0 ? 'sunday' : '',
+      dow === 6 ? 'saturday' : '',
+    ].filter(Boolean).join(' ');
+    html += `<button class="${cls}" onclick="selectCalDay(${y},${m},${d})">${d}</button>`;
+  }
+
+  // Next month leading days
+  const totalCells = firstDay + lastDate;
+  const remaining = (7 - (totalCells % 7)) % 7;
+  for (let d = 1; d <= remaining; d++) {
+    html += `<button class="cal-day other-month empty">${d}</button>`;
+  }
+
+  document.getElementById('calGrid').innerHTML = html;
+}
+
+function selectCalDay(y, m, d) {
+  currentDate = new Date(y, m, d);
+  updateDateUI();
+  closeCalendar();
+  loadSheet();
+}
+
+// ===================== INIT =====================
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  document.getElementById('clearBtn').style.display = searchQuery ? 'block' : 'none';
+  applyFilters();
+});
+
+// Auto-load on start
+window.addEventListener('load', () => {
+  updateDateUI();
+  loadSheet();
+});
 </script>
 </body>
 </html>
